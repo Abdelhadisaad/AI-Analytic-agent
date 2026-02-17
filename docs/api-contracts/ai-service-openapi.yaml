@@ -1,0 +1,43 @@
+openapi: 3.0.3
+info:
+  title: Python AI SQL Service
+  version: 1.0.0
+paths:
+  /api/v1/sql/generate:
+    post:
+      summary: Generate SQL proposal from natural language
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [question, correlationId]
+              properties:
+                question:
+                  type: string
+                context:
+                  type: string
+                  nullable: true
+                correlationId:
+                  type: string
+      responses:
+        '200':
+          description: SQL proposal generated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [sql, explanation, assumptions]
+                properties:
+                  sql:
+                    type: string
+                  explanation:
+                    type: string
+                  confidence:
+                    type: number
+                    nullable: true
+                  assumptions:
+                    type: array
+                    items:
+                      type: string

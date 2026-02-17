@@ -1,0 +1,28 @@
+openapi: 3.0.3
+info:
+  title: Analytics Orchestrator API
+  version: 1.0.0
+paths:
+  /api/v1/analytics/query:
+    post:
+      summary: Execute AI-driven analytics query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [question]
+              properties:
+                question:
+                  type: string
+                context:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Query executed
+        '400':
+          description: SQL validation failed
+        '500':
+          description: Internal error

@@ -1,0 +1,21 @@
+bin/
+obj/
+.vs/
+.vscode/
+
+**/bin/
+**/obj/
+
+*.user
+*.suo
+*.swp
+
+services/ai-service-python/.venv/
+services/ai-service-python/__pycache__/
+services/ai-service-python/.pytest_cache/
+
+# Documentation not to be pushed
+README.md
+docs/architecture-decisions.md
+docs/adr/
+docs/adrs/
