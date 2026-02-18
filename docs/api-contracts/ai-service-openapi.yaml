@@ -6,38 +6,296 @@ paths:
   /api/v1/sql/generate:
     post:
       summary: Generate SQL proposal from natural language
+      description: Internal contract used by ASP.NET orchestrator to request a SQL proposal and explainability metadata.
+      operationId: generateSqlProposal
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [question, correlationId]
-              properties:
-                question:
-                  type: string
-                context:
-                  type: string
-                  nullable: true
-                correlationId:
-                  type: string
+              $ref: '#/components/schemas/GenerateSqlRequest'
+            examples:
+              default:
+                value:
+                  requestId: "d4a89a57-48d0-4e27-b604-3f326ba8b9c3"
+                  correlationId: "corr-2026-02-17-001"
+                  naturalLanguageQuery: "Geef de top 5 klanten met de hoogste omzet in 2025"
+                  locale: "nl-NL"
+                  schemaMetadata:
+                    dialect: "postgresql"
+                    tables:
+                      - tableName: "sales.orders"
+                        description: "Customer orders"
+                        columns:
+                          - name: "order_id"
+                            type: "uuid"
+                            nullable: false
+                          - name: "customer_id"
+                            type: "uuid"
+                            nullable: false
+                          - name: "order_total"
+                            type: "numeric"
+                            nullable: false
+                          - name: "order_date"
+                            type: "date"
+                            nullable: false
+                      - tableName: "sales.customers"
+                        description: "Customer master data"
+                        columns:
+                          - name: "customer_id"
+                            type: "uuid"
+                            nullable: false
+                          - name: "customer_name"
+                            type: "text"
+                            nullable: false
+                    relationships:
+                      - fromTable: "sales.orders"
+                        fromColumn: "customer_id"
+                        toTable: "sales.customers"
+                        toColumn: "customer_id"
+                        relationType: "many-to-one"
+                  constraints:
+                    maxRows: 500
+                    allowAggregations: true
+                    allowedSchemas:
+                      - "sales"
       responses:
         '200':
           description: SQL proposal generated
           content:
             application/json:
               schema:
-                type: object
-                required: [sql, explanation, assumptions]
-                properties:
-                  sql:
-                    type: string
-                  explanation:
-                    type: string
-                  confidence:
-                    type: number
-                    nullable: true
-                  assumptions:
-                    type: array
-                    items:
-                      type: string
+                $ref: '#/components/schemas/GenerateSqlResponse'
+              examples:
+                default:
+                  value:
+                    requestId: "d4a89a57-48d0-4e27-b604-3f326ba8b9c3"
+                    correlationId: "corr-2026-02-17-001"
+                    sqlProposal:
+                      dialect: "postgresql"
+                      sql: "SELECT c.customer_name, SUM(o.order_total) AS total_revenue FROM sales.orders o JOIN sales.customers c ON c.customer_id = o.customer_id WHERE o.order_date >= DATE '2025-01-01' AND o.order_date < DATE '2026-01-01' GROUP BY c.customer_name ORDER BY total_revenue DESC LIMIT 5"
+                      parameters: []
+                    explanationMetadata:
+                      intentSummary: "Top 5 customers by total revenue in 2025"
+                      reasoningSummary: "Used orders and customers tables, joined on customer_id, aggregated order_total per customer and sorted descending."
+                      selectedTables:
+                        - "sales.orders"
+                        - "sales.customers"
+                      selectedColumns:
+                        - "sales.orders.order_total"
+                        - "sales.orders.order_date"
+                        - "sales.customers.customer_name"
+                      assumptions:
+                        - "order_total represents finalized revenue"
+                        - "order_date is in business timezone"
+                      confidenceScore: 0.79
+                      warnings: []
+        '400':
+          description: Invalid request payload
+        '422':
+          description: AI service could not produce a valid proposal
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    GenerateSqlRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - requestId
+        - correlationId
+        - naturalLanguageQuery
+        - schemaMetadata
+      properties:
+        requestId:
+          type: string
+          description: Unique id for this AI generation request.
+        correlationId:
+          type: string
+          description: Trace id shared across orchestrator logs.
+        naturalLanguageQuery:
+          type: string
+          minLength: 3
+          description: End-user analytical question in natural language.
+        locale:
+          type: string
+          description: Optional language/locale hint (e.g., nl-NL).
+        schemaMetadata:
+          $ref: '#/components/schemas/SchemaMetadata'
+        constraints:
+          $ref: '#/components/schemas/GenerationConstraints'
+
+    SchemaMetadata:
+      type: object
+      additionalProperties: false
+      required:
+        - dialect
+        - tables
+      properties:
+        dialect:
+          type: string
+          enum: [postgresql]
+        tables:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TableMetadata'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelationshipMetadata'
+
+    TableMetadata:
+      type: object
+      additionalProperties: false
+      required:
+        - tableName
+        - columns
+      properties:
+        tableName:
+          type: string
+        description:
+          type: string
+        columns:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ColumnMetadata'
+
+    ColumnMetadata:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        nullable:
+          type: boolean
+        semanticHint:
+          type: string
+
+    RelationshipMetadata:
+      type: object
+      additionalProperties: false
+      required:
+        - fromTable
+        - fromColumn
+        - toTable
+        - toColumn
+      properties:
+        fromTable:
+          type: string
+        fromColumn:
+          type: string
+        toTable:
+          type: string
+        toColumn:
+          type: string
+        relationType:
+          type: string
+          enum: [one-to-one, one-to-many, many-to-one, many-to-many]
+
+    GenerationConstraints:
+      type: object
+      additionalProperties: false
+      properties:
+        maxRows:
+          type: integer
+          minimum: 1
+          maximum: 5000
+        allowAggregations:
+          type: boolean
+        allowedSchemas:
+          type: array
+          items:
+            type: string
+
+    GenerateSqlResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - requestId
+        - correlationId
+        - sqlProposal
+        - explanationMetadata
+      properties:
+        requestId:
+          type: string
+        correlationId:
+          type: string
+        sqlProposal:
+          $ref: '#/components/schemas/SqlProposal'
+        explanationMetadata:
+          $ref: '#/components/schemas/ExplanationMetadata'
+
+    SqlProposal:
+      type: object
+      additionalProperties: false
+      required:
+        - dialect
+        - sql
+        - parameters
+      properties:
+        dialect:
+          type: string
+          enum: [postgresql]
+        sql:
+          type: string
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/SqlParameter'
+
+    SqlParameter:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+        value:
+          nullable: true
+
+    ExplanationMetadata:
+      type: object
+      additionalProperties: false
+      required:
+        - intentSummary
+        - reasoningSummary
+        - selectedTables
+        - selectedColumns
+        - assumptions
+        - confidenceScore
+        - warnings
+      properties:
+        intentSummary:
+          type: string
+        reasoningSummary:
+          type: string
+        selectedTables:
+          type: array
+          items:
+            type: string
+        selectedColumns:
+          type: array
+          items:
+            type: string
+        assumptions:
+          type: array
+          items:
+            type: string
+        confidenceScore:
+          type: number
+          minimum: 0
+          maximum: 1
+        warnings:
+          type: array
+          items:
+            type: string

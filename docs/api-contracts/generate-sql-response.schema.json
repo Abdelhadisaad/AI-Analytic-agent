@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://abdelhadisaad.github.io/AI-Analytic-agent/schemas/generate-sql-response.schema.json",
+  "title": "GenerateSqlResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "requestId",
+    "correlationId",
+    "sqlProposal",
+    "explanationMetadata"
+  ],
+  "properties": {
+    "requestId": {
+      "type": "string"
+    },
+    "correlationId": {
+      "type": "string"
+    },
+    "sqlProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dialect", "sql", "parameters"],
+      "properties": {
+        "dialect": {
+          "type": "string",
+          "enum": ["postgresql"]
+        },
+        "sql": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "value"],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {}
+            }
+          }
+        }
+      }
+    },
+    "explanationMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intentSummary",
+        "reasoningSummary",
+        "selectedTables",
+        "selectedColumns",
+        "assumptions",
+        "confidenceScore",
+        "warnings"
+      ],
+      "properties": {
+        "intentSummary": {
+          "type": "string"
+        },
+        "reasoningSummary": {
+          "type": "string"
+        },
+        "selectedTables": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "selectedColumns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidenceScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
