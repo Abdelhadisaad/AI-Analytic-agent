@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Python AI SQL Service
+  title: AI analytic agent Python AI SQL Service
   version: 1.0.0
 paths:
   /api/v1/sql/generate:
