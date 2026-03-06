@@ -20,3 +20,11 @@ docs/architecture-decisions.md
 docs/adr/
 docs/adrs/
 docs/local-dev-journal.md
+
+# Local OS/editor noise
+.DS_Store
+**/.DS_Store
+
+# Local proposal files
+PvA*.docx
+PvA*.pdf
