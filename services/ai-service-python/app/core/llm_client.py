@@ -5,6 +5,7 @@ import httpx
 
 from app.config import settings
 from app.core.exceptions import LlmProviderError, LlmTimeoutError
+from app.core.prompting import build_system_prompt
 
 
 class LlmClient:
@@ -18,7 +19,7 @@ class LlmClient:
             "model": settings.llm_model,
             "response_format": {"type": "json_object"},
             "messages": [
-                {"role": "system", "content": "You generate safe SQL proposals and explanations."},
+                {"role": "system", "content": build_system_prompt()},
                 {"role": "user", "content": prompt},
             ],
             "temperature": 0.1,

@@ -33,10 +33,16 @@ class GenerateSqlRequest(BaseModel):
     schemaMetadata: SchemaMetadata
 
 
+
+class SqlParameter(BaseModel):
+    name: str
+    value: str | int | float | bool | None = None
+
+
 class SqlProposal(BaseModel):
     dialect: str = "postgresql"
     sql: str
-    parameters: list[dict] = Field(default_factory=list)
+    parameters: list[SqlParameter] = Field(default_factory=list)
 
 
 class ExplanationMetadata(BaseModel):
