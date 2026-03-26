@@ -10,4 +10,6 @@ class GenerateSqlService:
     async def execute(self, request: GenerateSqlRequest) -> GenerateSqlResponse:
         prompt = build_prompt(request)
         llm_json = await self._llm_client.generate(prompt)
+        llm_json["requestId"] = request.requestId
+        llm_json["correlationId"] = request.correlationId
         return GenerateSqlResponse.model_validate(llm_json)

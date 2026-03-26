@@ -35,7 +35,7 @@ def build_system_prompt() -> str:
 def build_prompt(request: GenerateSqlRequest) -> str:
     table_lines = []
     for table in request.schemaMetadata.tables:
-        columns = ", ".join([f"{column.name}:{column.type}" for column in table.columns])
+        columns = ", ".join([f"{column.columnName}:{column.dataType}" for column in table.columns])
         table_lines.append(f"- {table.tableName} ({columns})")
 
     relationships = []

@@ -1,16 +1,18 @@
+from typing import Optional, Union
+
 from pydantic import BaseModel, Field
 
 
 class ColumnMetadata(BaseModel):
-    name: str
-    type: str
-    nullable: bool | None = None
-    semanticHint: str | None = None
+    columnName: str
+    dataType: str
+    isNullable: Optional[bool] = None
+    description: Optional[str] = None
 
 
 class TableMetadata(BaseModel):
     tableName: str
-    description: str | None = None
+    description: Optional[str] = None
     columns: list[ColumnMetadata]
 
 
@@ -19,7 +21,7 @@ class RelationshipMetadata(BaseModel):
     fromColumn: str
     toTable: str
     toColumn: str
-    relationType: str | None = None
+    relationType: Optional[str] = None
 
 
 class SchemaMetadata(BaseModel):
@@ -29,14 +31,17 @@ class SchemaMetadata(BaseModel):
 
 
 class GenerateSqlRequest(BaseModel):
+    requestId: Optional[str] = None
+    correlationId: Optional[str] = None
     naturalLanguageQuery: str = Field(min_length=3)
+    locale: Optional[str] = None
     schemaMetadata: SchemaMetadata
 
 
 
 class SqlParameter(BaseModel):
     name: str
-    value: str | int | float | bool | None = None
+    value: Optional[Union[str, int, float, bool]] = None
 
 
 class SqlProposal(BaseModel):
@@ -56,5 +61,7 @@ class ExplanationMetadata(BaseModel):
 
 
 class GenerateSqlResponse(BaseModel):
+    requestId: Optional[str] = None
+    correlationId: Optional[str] = None
     sqlProposal: SqlProposal
     explanationMetadata: ExplanationMetadata
