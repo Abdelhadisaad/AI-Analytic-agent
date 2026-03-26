@@ -1,0 +1,158 @@
+@page
+@model Analytics.Api.Pages.IndexModel
+@{
+    ViewData["Title"] = "AI Analytics Agent";
+}
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <h1>AI Analytics Agent</h1>
+        <p class="subtitle">Stel een vraag in natuurlijke taal en ontvang data-inzichten</p>
+    </header>
+
+    <main>
+        <form method="post" id="queryForm">
+            <div class="form-group">
+                <label for="NaturalLanguageQuery">Vraag</label>
+                <textarea asp-for="NaturalLanguageQuery" id="NaturalLanguageQuery"
+                          rows="3" placeholder="Bijv. Hoeveel orders zijn er per status?"
+                          required></textarea>
+                <span asp-validation-for="NaturalLanguageQuery" class="validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="SelectedProfile">Database profiel</label>
+                <select asp-for="SelectedProfile" id="SelectedProfile">
+                    <option value="AnalyticsReadOnly">Analytics (Read-Only)</option>
+                    <option value="FinanceReadOnly">Finance (Read-Only)</option>
+                </select>
+            </div>
+
+            <button type="submit" id="submitBtn">
+                <span class="btn-text">Analyseer</span>
+                <span class="btn-loading" style="display:none;">Bezig...</span>
+            </button>
+        </form>
+
+        @if (Model.HasResult)
+        {
+            <!-- Error Message -->
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <section class="result-section error-section">
+                    <h2>Fout!</h2>
+                    <div class="error-box">
+                        <p class="error-message">@Model.ErrorMessage</p>
+                        @if (!string.IsNullOrEmpty(Model.SuggestedAction))
+                        {
+                            <p class="suggested-action">💡 @Model.SuggestedAction</p>
+                        }
+                        @if (Model.ValidationErrors?.Any() == true)
+                        {
+                            <div class="validation-errors">
+                                <strong>Validatiefouten:</strong>
+                                <ul>
+                                    @foreach (var error in Model.ValidationErrors)
+                                    {
+                                        <li>@error</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- SQL Proposal -->
+            @if (!string.IsNullOrEmpty(Model.GeneratedSql))
+            {
+                <section class="result-section sql-section">
+                    <h2>SQL Voorstel</h2>
+                    <div class="sql-meta">
+                        @if (Model.ConfidenceScore.HasValue)
+                        {
+                            <span class="badge @Model.ConfidenceCssClass">
+                                Betrouwbaarheid: @Model.ConfidenceScore.Value.ToString("P0")
+                            </span>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.IntentSummary))
+                        {
+                            <span class="intent">@Model.IntentSummary</span>
+                        }
+                    </div>
+                    <pre class="sql-code"><code>@Model.GeneratedSql</code></pre>
+                </section>
+            }
+
+            <!-- Query Result -->
+            @if (Model.ResultRows?.Any() == true)
+            {
+                <section class="result-section data-section">
+                    <h2>Resultaat</h2>
+                    <div class="result-meta">
+                        <span>@Model.ResultRows.Count rijen</span>
+                        @if (Model.IsTruncated)
+                        {
+                            <span class="badge badge-warning">Afgekapt</span>
+                        }
+                        @if (Model.ExecutionDurationMs.HasValue)
+                        {
+                            <span>⏱ @Model.ExecutionDurationMs ms</span>
+                        }
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    @foreach (var col in Model.ResultColumns)
+                                    {
+                                        <th>@col</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var row in Model.ResultRows)
+                                {
+                                    <tr>
+                                        @foreach (var col in Model.ResultColumns)
+                                        {
+                                            <td>@(row.TryGetValue(col, out var val) ? val?.ToString() ?? "NULL" : "")</td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+            else if (string.IsNullOrEmpty(Model.ErrorMessage) && !string.IsNullOrEmpty(Model.GeneratedSql))
+            {
+                <section class="result-section data-section">
+                    <h2>Resultaat</h2>
+                    <p class="empty-result">Geen rijen gevonden.</p>
+                </section>
+            }
+        }
+    </main>
+
+    <footer>
+        <p>AI Analytics Agent &mdash; HBO Afstuderen</p>
+    </footer>
+
+    <script>
+        document.getElementById('queryForm').addEventListener('submit', function() {
+            document.querySelector('.btn-text').style.display = 'none';
+            document.querySelector('.btn-loading').style.display = 'inline';
+            document.getElementById('submitBtn').disabled = true;
+        });
+    </script>
+</body>
+</html>

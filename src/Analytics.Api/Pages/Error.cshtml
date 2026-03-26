@@ -1,0 +1,36 @@
+@page
+@model Analytics.Api.Pages.ErrorModel
+@{
+    ViewData["Title"] = "Fout";
+}
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <h1>Er is een fout opgetreden</h1>
+    </header>
+    <main>
+        <section class="result-section error-section">
+            <h2>Onverwachte fout</h2>
+            <div class="error-box">
+                <p class="error-message">
+                    Er is een onverwachte fout opgetreden bij het verwerken van uw verzoek.
+                    Probeer het later opnieuw.
+                </p>
+            </div>
+            <br />
+            <a href="/" style="color:#4361ee;font-weight:600;">← Terug naar de startpagina</a>
+        </section>
+    </main>
+    <footer>
+        <p>AI Analytics Agent &mdash; HBO Afstuderen</p>
+    </footer>
+</body>
+</html>
