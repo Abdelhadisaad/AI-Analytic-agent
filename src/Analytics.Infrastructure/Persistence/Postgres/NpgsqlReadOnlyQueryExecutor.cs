@@ -79,6 +79,7 @@ public sealed class NpgsqlReadOnlyQueryExecutor : IReadOnlyQueryExecutor
             rows.Add(row);
         }
 
+        await reader.CloseAsync();
         await transaction.CommitAsync(ct);
         stopwatch.Stop();
 
