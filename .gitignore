@@ -13,6 +13,9 @@ obj/
 services/ai-service-python/.venv/
 services/ai-service-python/__pycache__/
 services/ai-service-python/.pytest_cache/
+services/ai-service-python/.env
+services/ai-service-python/test_llm.py
+services/ai-service-python/app/mock_main.py
 
 # Documentation not to be pushed
 README.md
