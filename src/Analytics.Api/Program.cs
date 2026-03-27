@@ -1,9 +1,13 @@
+using Analytics.Application.UseCases.ExecuteAnalyticsQuery;
 using Analytics.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Razor Pages
 builder.Services.AddRazorPages();
+
+// Register application use-cases
+builder.Services.AddScoped<ExecuteAnalyticsQueryUseCase>();
 
 // Register infrastructure services
 builder.Services.AddAiServiceClient(builder.Configuration);

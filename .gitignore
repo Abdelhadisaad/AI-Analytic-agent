@@ -31,3 +31,6 @@ docs/local-dev-journal.md
 # Local proposal files
 PvA*.docx
 PvA*.pdf
+
+# Local dev settings
+**/Properties/launchSettings.json

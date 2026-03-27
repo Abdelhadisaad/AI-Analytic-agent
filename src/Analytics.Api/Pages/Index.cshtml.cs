@@ -1,36 +1,25 @@
 using System.ComponentModel.DataAnnotations;
-using Analytics.Application.Abstractions;
 using Analytics.Application.Models;
+using Analytics.Application.UseCases.ExecuteAnalyticsQuery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Analytics.Api.Pages;
 
+/// <summary>
+/// Razor Page that handles user input and displays results.
+/// Contains NO business logic — delegates entirely to the use-case.
+/// </summary>
 public class IndexModel : PageModel
 {
-    private readonly IAiServiceClient _aiServiceClient;
-    private readonly ISqlValidator _sqlValidator;
-    private readonly IReadOnlyQueryExecutor _queryExecutor;
-    private readonly IFallbackHandler _fallbackHandler;
-    private readonly ISchemaDiscoveryService _schemaDiscovery;
-    private readonly ILogger<IndexModel> _logger;
+    private readonly ExecuteAnalyticsQueryUseCase _useCase;
 
-    public IndexModel(
-        IAiServiceClient aiServiceClient,
-        ISqlValidator sqlValidator,
-        IReadOnlyQueryExecutor queryExecutor,
-        IFallbackHandler fallbackHandler,
-        ISchemaDiscoveryService schemaDiscovery,
-        ILogger<IndexModel> logger)
+    public IndexModel(ExecuteAnalyticsQueryUseCase useCase)
     {
-        _aiServiceClient = aiServiceClient;
-        _sqlValidator = sqlValidator;
-        _queryExecutor = queryExecutor;
-        _fallbackHandler = fallbackHandler;
-        _schemaDiscovery = schemaDiscovery;
-        _logger = logger;
+        _useCase = useCase;
     }
 
+    // ── Input properties ─────────────────────────────────────────
 
     [BindProperty]
     [Required(ErrorMessage = "Voer een vraag in.")]
@@ -60,6 +49,7 @@ public class IndexModel : PageModel
         _ => "badge-danger"
     };
 
+    // ── Handlers ─────────────────────────────────────────────────
 
     public void OnGet() { }
 
@@ -76,87 +66,42 @@ public class IndexModel : PageModel
             return Page();
         }
 
-        var requestId = Guid.NewGuid().ToString("N");
-        var correlationId = Guid.NewGuid().ToString("N");
+        // ── Delegate to use-case ─────────────────────────────────
+        var input = new AnalyticsQueryInput(NaturalLanguageQuery, profileId);
+        var result = await _useCase.ExecuteAsync(input, ct);
 
-        _logger.LogInformation(
-            "Pipeline gestart – CorrelationId={CorrelationId}, Profiel={Profile}, Vraag={Query}",
-            correlationId, profileId, NaturalLanguageQuery);
-
-        // ── 1. Genereer SQL via AI service ───────────────────────
-        var schemaMetadata = await _schemaDiscovery.DiscoverAsync(profileId, ct);
-
-        var request = new GenerateSqlRequest
-        {
-            RequestId = requestId,
-            CorrelationId = correlationId,
-            NaturalLanguageQuery = NaturalLanguageQuery,
-            Locale = "nl",
-            SchemaMetadata = schemaMetadata
-        };
-
-        var aiResult = await _aiServiceClient.GenerateSqlAsync(request, ct);
-
-        if (!aiResult.IsSuccess)
-        {
-            var fallback = _fallbackHandler.HandleAiServiceFailure(
-                aiResult.FailureType!.Value, aiResult.FailureMessage ?? "Onbekende fout", NaturalLanguageQuery);
-            SetFallback(fallback);
-            return Page();
-        }
-
-        var sqlProposal = aiResult.Response!.SqlProposal;
-        GeneratedSql = sqlProposal.Sql;
-        IntentSummary = aiResult.Response.ExplanationMetadata.IntentSummary;
-        ConfidenceScore = aiResult.Response.ExplanationMetadata.ConfidenceScore;
-
-        // ── 2. Valideer de gegenereerde SQL ──────────────────────
-        var validationResult = _sqlValidator.Validate(sqlProposal.Sql);
-
-        if (!validationResult.IsValid)
-        {
-            var fallback = _fallbackHandler.HandleValidationFailure(
-                validationResult, sqlProposal.Sql, NaturalLanguageQuery);
-            SetFallback(fallback);
-            return Page();
-        }
-
-        // ── 3. Voer de query uit ─────────────────────────────────
-        try
-        {
-            var queryResult = await _queryExecutor.ExecuteAsync(profileId, sqlProposal.Sql, ct);
-
-            ResultRows = queryResult.Rows;
-            ExecutionDurationMs = queryResult.DurationMs;
-            IsTruncated = queryResult.Truncated;
-
-            if (queryResult.Rows.Count > 0)
-            {
-                ResultColumns = queryResult.Rows[0].Keys.ToList();
-            }
-
-            _logger.LogInformation(
-                "Pipeline voltooid – CorrelationId={CorrelationId}, Rijen={RowCount}, Duur={DurationMs}ms",
-                correlationId, queryResult.RowCount, queryResult.DurationMs);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Database-uitvoering mislukt – CorrelationId={CorrelationId}", correlationId);
-            var fallback = _fallbackHandler.HandleDatabaseFailure(ex, sqlProposal.Sql, NaturalLanguageQuery);
-            SetFallback(fallback);
-        }
+        // ── Map result to UI properties ──────────────────────────
+        MapResultToView(result);
 
         return Page();
     }
 
     // ── Private helpers ──────────────────────────────────────────
 
-    private void SetFallback(FallbackInfo fallback)
+    private void MapResultToView(AnalyticsQueryResult result)
     {
-        ErrorMessage = fallback.Message;
-        SuggestedAction = fallback.SuggestedAction;
-        ValidationErrors = fallback.ValidationErrors;
+        switch (result.Status)
+        {
+            case AnalyticsQueryStatus.Success:
+                var data = result.Data!;
+                GeneratedSql = data.ExecutedSql;
+                ResultRows = data.Rows;
+                ExecutionDurationMs = data.ExecutionDurationMs;
+                IsTruncated = data.IsTruncated;
+                IntentSummary = data.Explanation?.IntentSummary;
+                ConfidenceScore = data.Explanation?.ConfidenceScore;
+
+                if (data.Rows.Count > 0)
+                    ResultColumns = data.Rows[0].Keys.ToList();
+                break;
+
+            case AnalyticsQueryStatus.Fallback:
+            case AnalyticsQueryStatus.Rejected:
+                var fallback = result.Fallback!;
+                ErrorMessage = fallback.Message;
+                SuggestedAction = fallback.SuggestedAction;
+                ValidationErrors = fallback.ValidationErrors;
+                break;
+        }
     }
-
-
 }
