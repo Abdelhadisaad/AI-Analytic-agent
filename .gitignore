@@ -34,3 +34,6 @@ PvA*.pdf
 
 # Local dev settings
 **/Properties/launchSettings.json
+
+# Demo runtime artifacts
+.run/
