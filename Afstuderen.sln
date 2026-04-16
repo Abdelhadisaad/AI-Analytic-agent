@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -15,6 +15,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analytics.Api", "src\Analytics.Api\Analytics.Api.csproj", "{FF86A83E-589D-D9A0-433E-ECA0FD7038BB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analytics.Infrastructure", "src\Analytics.Infrastructure\Analytics.Infrastructure.csproj", "{0BC66591-584D-3E11-D1D2-5284EAC83164}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analytics.SystemTests", "tests\Analytics.SystemTests\Analytics.SystemTests.csproj", "{E93AE0DC-798A-4650-AE6F-0B5D4A34676E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,10 @@ Global
 		{0BC66591-584D-3E11-D1D2-5284EAC83164}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BC66591-584D-3E11-D1D2-5284EAC83164}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BC66591-584D-3E11-D1D2-5284EAC83164}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E93AE0DC-798A-4650-AE6F-0B5D4A34676E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E93AE0DC-798A-4650-AE6F-0B5D4A34676E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E93AE0DC-798A-4650-AE6F-0B5D4A34676E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E93AE0DC-798A-4650-AE6F-0B5D4A34676E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,6 +58,7 @@ Global
 		{406FDA30-A755-623A-D93A-B4EBA75F148E} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{FF86A83E-589D-D9A0-433E-ECA0FD7038BB} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{0BC66591-584D-3E11-D1D2-5284EAC83164} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{E93AE0DC-798A-4650-AE6F-0B5D4A34676E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EBE1283F-CD77-4AA3-BE06-E198BF82F094}

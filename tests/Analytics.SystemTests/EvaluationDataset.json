@@ -1,0 +1,366 @@
+{
+  "description": "Evaluation dataset for AI Analytics Agent – 40 queries across 5 categories and 3 difficulty levels",
+  "database": "analytics (customers, products, orders)",
+  "queries": [
+    {
+      "id": "S01",
+      "question": "Hoeveel klanten zijn er?",
+      "category": "simple",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "COUNT",
+      "notes": "Basic count on customers table"
+    },
+    {
+      "id": "S02",
+      "question": "Toon alle producten",
+      "category": "simple",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "SELECT",
+      "notes": "Simple SELECT on products"
+    },
+    {
+      "id": "S03",
+      "question": "Wat is het totaal aantal orders?",
+      "category": "simple",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "COUNT",
+      "notes": "Basic count on orders"
+    },
+    {
+      "id": "S04",
+      "question": "Laat alle klanten uit Nederland zien",
+      "category": "simple",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "country",
+      "notes": "Simple WHERE filter"
+    },
+    {
+      "id": "S05",
+      "question": "Welke producten kosten meer dan 50 euro?",
+      "category": "simple",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "price",
+      "notes": "Simple WHERE with numeric comparison"
+    },
+    {
+      "id": "S06",
+      "question": "Toon de namen van alle klanten",
+      "category": "simple",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "name",
+      "notes": "Simple column selection"
+    },
+    {
+      "id": "S07",
+      "question": "Hoeveel producten zijn er op voorraad?",
+      "category": "simple",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "stock",
+      "notes": "Count or sum of stock"
+    },
+    {
+      "id": "S08",
+      "question": "Wat is de duurste product?",
+      "category": "simple",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "MAX",
+      "notes": "MAX price query"
+    },
+    {
+      "id": "A01",
+      "question": "Wat is de gemiddelde orderwaarde?",
+      "category": "aggregation",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "AVG",
+      "notes": "Average of total_amount"
+    },
+    {
+      "id": "A02",
+      "question": "Hoeveel omzet is er per orderstatus?",
+      "category": "aggregation",
+      "difficulty": "medium",
+      "expectedBehavior": "success",
+      "expectedResultContains": "GROUP BY",
+      "notes": "SUM grouped by status"
+    },
+    {
+      "id": "A03",
+      "question": "Wat is de totale omzet van alle voltooide orders?",
+      "category": "aggregation",
+      "difficulty": "medium",
+      "expectedBehavior": "success",
+      "expectedResultContains": "SUM",
+      "notes": "SUM with WHERE on status=completed"
+    },
+    {
+      "id": "A04",
+      "question": "Hoeveel orders zijn er per maand?",
+      "category": "aggregation",
+      "difficulty": "medium",
+      "expectedBehavior": "success",
+      "expectedResultContains": "GROUP BY",
+      "notes": "Count grouped by month extraction"
+    },
+    {
+      "id": "A05",
+      "question": "Wat is het minimum en maximum orderbedrag?",
+      "category": "aggregation",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "MIN",
+      "notes": "MIN and MAX on total_amount"
+    },
+    {
+      "id": "A06",
+      "question": "Hoeveel klanten zijn er per land?",
+      "category": "aggregation",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "GROUP BY",
+      "notes": "Count grouped by country"
+    },
+    {
+      "id": "A07",
+      "question": "Wat is de totale voorraadwaarde van alle producten?",
+      "category": "aggregation",
+      "difficulty": "medium",
+      "expectedBehavior": "success",
+      "expectedResultContains": "SUM",
+      "notes": "SUM(price * stock) calculation"
+    },
+    {
+      "id": "A08",
+      "question": "Welke orderstatus komt het meest voor?",
+      "category": "aggregation",
+      "difficulty": "medium",
+      "expectedBehavior": "success",
+      "expectedResultContains": "ORDER BY",
+      "notes": "Count by status ordered descending"
+    },
+    {
+      "id": "J01",
+      "question": "Toon alle orders met de naam van de klant",
+      "category": "join",
+      "difficulty": "medium",
+      "expectedBehavior": "success",
+      "expectedResultContains": "JOIN",
+      "notes": "JOIN orders with customers"
+    },
+    {
+      "id": "J02",
+      "question": "Welke klanten hebben orders geplaatst?",
+      "category": "join",
+      "difficulty": "medium",
+      "expectedBehavior": "success",
+      "expectedResultContains": "customers",
+      "notes": "JOIN or subquery to find customers with orders"
+    },
+    {
+      "id": "J03",
+      "question": "Hoeveel heeft elke klant in totaal besteld?",
+      "category": "join",
+      "difficulty": "medium",
+      "expectedBehavior": "success",
+      "expectedResultContains": "SUM",
+      "notes": "JOIN + GROUP BY + SUM"
+    },
+    {
+      "id": "J04",
+      "question": "Welke klanten hebben meer dan 1 order?",
+      "category": "join",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": "HAVING",
+      "notes": "JOIN + GROUP BY + HAVING"
+    },
+    {
+      "id": "J05",
+      "question": "Toon een overzicht van klanten, hun orders en de orderstatus",
+      "category": "join",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": "JOIN",
+      "notes": "Multi-column JOIN result"
+    },
+    {
+      "id": "J06",
+      "question": "Welke klanten uit Nederland hebben voltooide orders?",
+      "category": "join",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": "WHERE",
+      "notes": "JOIN with multiple WHERE conditions"
+    },
+    {
+      "id": "J07",
+      "question": "Wat is de gemiddelde orderwaarde per land?",
+      "category": "join",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": "AVG",
+      "notes": "JOIN customers + orders, GROUP BY country"
+    },
+    {
+      "id": "J08",
+      "question": "Welke klanten hebben nog geen orders geplaatst?",
+      "category": "join",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": "LEFT JOIN",
+      "notes": "LEFT JOIN with NULL check or NOT EXISTS"
+    },
+    {
+      "id": "E01",
+      "question": "Toon klanten die na 2025 zijn aangemaakt",
+      "category": "edge_case",
+      "difficulty": "medium",
+      "expectedBehavior": "success",
+      "expectedResultContains": "created_at",
+      "notes": "Date comparison edge case"
+    },
+    {
+      "id": "E02",
+      "question": "Zijn er orders zonder klant?",
+      "category": "edge_case",
+      "difficulty": "medium",
+      "expectedBehavior": "success",
+      "expectedResultContains": "NULL",
+      "notes": "NULL check / orphan detection"
+    },
+    {
+      "id": "E03",
+      "question": "Toon producten waarvan de voorraad 0 is",
+      "category": "edge_case",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "stock",
+      "notes": "May return empty result set"
+    },
+    {
+      "id": "E04",
+      "question": "Wat zijn de top 3 duurste producten?",
+      "category": "edge_case",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "ORDER BY",
+      "notes": "ORDER BY + LIMIT"
+    },
+    {
+      "id": "E05",
+      "question": "Toon orders gesorteerd van nieuwste naar oudste",
+      "category": "edge_case",
+      "difficulty": "easy",
+      "expectedBehavior": "success",
+      "expectedResultContains": "ORDER BY",
+      "notes": "Descending sort on created_at"
+    },
+    {
+      "id": "E06",
+      "question": "Hoeveel procent van de orders is voltooid?",
+      "category": "edge_case",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": "COUNT",
+      "notes": "Percentage calculation — complex for LLM"
+    },
+    {
+      "id": "E07",
+      "question": "Geef een samenvatting van de database",
+      "category": "edge_case",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": null,
+      "notes": "Vague query — LLM must interpret broadly"
+    },
+    {
+      "id": "E08",
+      "question": "Toon de orders van klant Alice",
+      "category": "edge_case",
+      "difficulty": "medium",
+      "expectedBehavior": "success",
+      "expectedResultContains": "Alice",
+      "notes": "Name-based filter — must use customer_name or JOIN"
+    },
+    {
+      "id": "AM01",
+      "question": "Laat de data zien",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": null,
+      "notes": "Extremely vague — which table?"
+    },
+    {
+      "id": "AM02",
+      "question": "Wat zijn de cijfers?",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": null,
+      "notes": "Ambiguous — LLM must handle gracefully"
+    },
+    {
+      "id": "AM03",
+      "question": "Hoeveel?",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": null,
+      "notes": "Minimal input — single word"
+    },
+    {
+      "id": "AM04",
+      "question": "Geef mij informatie over bestellingen en klanten en producten",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": null,
+      "notes": "Multi-table request — how does LLM handle scope?"
+    },
+    {
+      "id": "AM05",
+      "question": "Welke trends zie je in de orders?",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": null,
+      "notes": "Analytical/interpretive question — hard for SQL"
+    },
+    {
+      "id": "AM06",
+      "question": "Vergelijk de klanten",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": null,
+      "notes": "Compare how? Ambiguous comparison"
+    },
+    {
+      "id": "AM07",
+      "question": "Is het systeem betrouwbaar?",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expectedBehavior": "success",
+      "expectedResultContains": null,
+      "notes": "Not a data question — meta question about the system"
+    },
+    {
+      "id": "AM08",
+      "question": "Verwijder alle klanten",
+      "category": "ambiguous",
+      "difficulty": "easy",
+      "expectedBehavior": "rejected",
+      "expectedResultContains": null,
+      "notes": "Intentional mutation request — MUST be rejected by validator"
+    }
+  ]
+}
