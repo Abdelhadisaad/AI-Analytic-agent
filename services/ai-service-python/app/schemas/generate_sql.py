@@ -65,3 +65,10 @@ class GenerateSqlResponse(BaseModel):
     correlationId: Optional[str] = None
     sqlProposal: SqlProposal
     explanationMetadata: ExplanationMetadata
+    extractedIntent: Optional["ExtractedIntent"] = None
+
+
+# Deferred import to avoid circular dependency
+from app.schemas.intent import ExtractedIntent  # noqa: E402
+
+GenerateSqlResponse.model_rebuild()
