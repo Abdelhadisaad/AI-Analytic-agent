@@ -18,6 +18,32 @@ API_PID_FILE="$RUN_DIR/api-service.pid"
 AI_LOG_FILE="$RUN_DIR/ai-service.log"
 API_LOG_FILE="$RUN_DIR/api-service.log"
 
+RUN_EVALUATION="false"
+
+usage() {
+  echo "Gebruik: $0 [--with-eval]"
+  echo
+  echo "Opties:"
+  echo "  --with-eval   Draai na startup direct de evaluatie-tests"
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    --with-eval)
+      RUN_EVALUATION="true"
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Onbekende optie: $arg"
+      usage
+      exit 1
+      ;;
+  esac
+done
+
 mkdir -p "$RUN_DIR"
 
 is_running() {
@@ -84,6 +110,17 @@ wait_for_http() {
   return 1
 }
 
+run_evaluation() {
+  echo
+  echo "Start evaluatie-framework..."
+  (
+    cd "$ROOT_DIR"
+    EVALUATION_API_BASE_URL="$API_URL" \
+      dotnet test tests/Analytics.SystemTests --filter "Category=Evaluation" --logger "console;verbosity=detailed"
+  )
+  echo "Evaluatie klaar. Rapport: $ROOT_DIR/tests/evaluation-report.json"
+}
+
 start_ai_service
 start_api_service
 
@@ -98,3 +135,7 @@ echo "Demo draait."
 echo "- AI log:  $AI_LOG_FILE"
 echo "- API log: $API_LOG_FILE"
 echo "Stoppen: kill \"$(cat "$AI_PID_FILE")\" \"$(cat "$API_PID_FILE")\""
+
+if [[ "$RUN_EVALUATION" == "true" ]]; then
+  run_evaluation
+fi

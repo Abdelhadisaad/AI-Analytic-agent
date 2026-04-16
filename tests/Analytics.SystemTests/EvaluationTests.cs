@@ -35,7 +35,9 @@ public class EvaluationTests : IDisposable
     public EvaluationTests(ITestOutputHelper output)
     {
         _output = output;
-        _client = new PipelineClient("http://localhost:5200");
+        var apiBaseUrl = Environment.GetEnvironmentVariable("EVALUATION_API_BASE_URL")
+            ?? "http://localhost:5200";
+        _client = new PipelineClient(apiBaseUrl);
         _runner = new EvaluationRunner(_client);
     }
 
